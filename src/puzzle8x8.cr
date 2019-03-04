@@ -41,12 +41,26 @@ def get_piece_positions(piece)
   positions
 end
 
-positions = Array(Set(Field)).new(PIECES.size)
+def get_cell_choices(positions)
+  choices = Array.new(64) { [] of Field }
 
-PIECES.each do |piece|
-  positions << get_piece_positions(piece)
+  positions.each do |pos|
+    cells = pos.cells_covered
+    cells.each do |i|
+      choices[i] << pos
+    end
+  end
+
+  choices
 end
 
-positions.each do |pos|
-  puts pos.size
+positions = Array(Array(Array(Field))).new(PIECES.size)
+
+PIECES.each do |piece|
+  pos = get_piece_positions(piece)
+  positions << get_cell_choices(pos)
+end
+
+positions[9][13].each do |piece|
+  puts piece
 end

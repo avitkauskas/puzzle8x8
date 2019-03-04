@@ -111,6 +111,14 @@ struct Field
     end
   end
 
+  def cells_covered
+    cells = [] of Int32
+    64.times do |i|
+      cells << 63 - i if @field.bit(i) == 1
+    end
+    cells
+  end
+
   def to_s(io)
     7.downto 0 do |i|
       7.downto 0 do |j|
