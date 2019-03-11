@@ -182,6 +182,28 @@ describe Field do
       combined.should eq copy
     end
   end
+
+  describe ".lowest_uncovered_cell" do
+    it "should return nil if all cells covered" do
+      Field.new(0x_FFFF_FFFF_FFFF_FFFF_u64).lowest_uncovered_cell.should be_nil
+    end
+
+    it "should return 0 if no cells are covered" do
+      Field.new(0x_0000_0000_0000_0000_u64).lowest_uncovered_cell.should eq 0
+    end
+
+    it "should return 0 if the beginning cells are uncovered" do
+      Field.new(0x_0FFF_FFFF_0000_FFFF_u64).lowest_uncovered_cell.should eq 0
+    end
+
+    it "should return correct number if uncoverd cells are in the middle" do
+      Field.new(0x_F0FF_FFFF_0000_FFFF_u64).lowest_uncovered_cell.should eq 4
+    end
+
+    it "should return 63 if only the last cell is uncovered" do
+      Field.new(0x_FFFF_FFFF_FFFF_FFFE_u64).lowest_uncovered_cell.should eq 63
+    end
+  end
 end
 
 module Factory

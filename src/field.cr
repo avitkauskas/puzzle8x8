@@ -8,10 +8,10 @@ struct Field
     @field = str.delete("\n ").ljust(64, '0').to_u64(base: 2)
   end
 
-  LEFT_COLUMN  = 0b_10000000_10000000_10000000_10000000_10000000_10000000_10000000_10000000
-  RIGHT_COLUMN = 0b_00000001_00000001_00000001_00000001_00000001_00000001_00000001_00000001
-  TOP_ROW      = 0b_11111111_00000000_00000000_00000000_00000000_00000000_00000000_00000000
-  BOTTOM_ROW   = 0b_00000000_00000000_00000000_00000000_00000000_00000000_00000000_11111111
+  LEFT_COLUMN  = 0b_10000000_10000000_10000000_10000000_10000000_10000000_10000000_10000000_u64
+  RIGHT_COLUMN = 0b_00000001_00000001_00000001_00000001_00000001_00000001_00000001_00000001_u64
+  TOP_ROW      = 0b_11111111_00000000_00000000_00000000_00000000_00000000_00000000_00000000_u64
+  BOTTOM_ROW   = 0b_00000000_00000000_00000000_00000000_00000000_00000000_00000000_11111111_u64
 
   def can_shift_left?
     @field & LEFT_COLUMN == 0
@@ -53,9 +53,9 @@ struct Field
     Field.new(field)
   end
 
-  K1 = 0x_aa00_aa00_aa00_aa00
-  K2 = 0x_cccc_0000_cccc_0000
-  K3 = 0x_f0f0_f0f0_0f0f_0f0f
+  K1 = 0x_aa00_aa00_aa00_aa00_u64
+  K2 = 0x_cccc_0000_cccc_0000_u64
+  K3 = 0x_f0f0_f0f0_0f0f_0f0f_u64
 
   def flip_diagonal
     field = @field
@@ -68,8 +68,8 @@ struct Field
     Field.new(field)
   end
 
-  K4 = 0x_00ff_00ff_00ff_00ff
-  K5 = 0x_0000_ffff_0000_ffff
+  K4 = 0x_00ff_00ff_00ff_00ff_u64
+  K5 = 0x_0000_ffff_0000_ffff_u64
 
   def flip_horizontal
     field = @field
@@ -111,12 +111,22 @@ struct Field
     end
   end
 
-  def cells_covered
+  def covered_cells
     cells = [] of Int32
-    64.times do |i|
+    63.downto 0 do |i|
       cells << 63 - i if @field.bit(i) == 1
     end
     cells
+  end
+
+  def lowest_uncovered_cell
+    lowest = nil
+    63.downto 0 do |i|
+      next if @field.bit(i) == 1
+      lowest = 63 - i
+      break
+    end
+    lowest
   end
 
   def to_s(io)
